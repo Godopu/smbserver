@@ -53,7 +53,8 @@ func GetIP() string {
 			// handle err
 
 			for _, addr := range addrs {
-				if idx := strings.IndexByte(addr.String(), '/'); idx != -1 {
+				if idx := strings.IndexByte(addr.String(), '/'); idx != -1 &&
+					!strings.Contains(addr.String(), ":") {
 					return addr.String()[:idx]
 				}
 				// process IP address
