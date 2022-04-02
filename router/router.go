@@ -20,7 +20,7 @@ func NewRouter() *gin.Engine {
 		apiv1.GET("/alarm", GetAlarm)
 	}
 	assetEngine := gin.New()
-	assetEngine.Static("/", "./front/build/web")
+	assetEngine.Static("/", "./web")
 
 	r := gin.New()
 	r.Any("/*any", func(c *gin.Context) {
