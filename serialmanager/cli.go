@@ -50,22 +50,36 @@ func init() {
 
 func Run() error {
 	var err error
-	iface, err = discoverDevice()
-	if err != nil {
-		return err
-	}
-	if discoverHandleFunc != nil {
-		discoverHandleFunc(NewEvent(map[string]interface{}{"iface": iface}, "discovered"))
-	}
+	for {
+		iface, err = discoverDevice()
+		if err != nil {
+			if err.Error() == "not found device" {
+				iface, err = WatchNewDevice(ctx)
+			}
 
-	err = initDevice()
-	if err != nil {
-		panic(err)
+			if err != nil {
+				return err
+			}
+		}
+		if discoverHandleFunc != nil {
+			discoverHandleFunc(NewEvent(map[string]interface{}{"iface": iface}, "discovered"))
+		}
+
+		err = initDevice()
+		if err != nil {
+			panic(err)
+		}
+
+		err := recv(port, recvHandleFunc)
+		if err.Error() == "EOF" {
+			if onDisconnected != nil {
+				onDisconnected(NewEvent(map[string]interface{}{"iface": iface}, "disconnected"))
+			}
+			iface = ""
+		} else {
+			panic(err)
+		}
 	}
-
-	recv(port, recvHandleFunc)
-
-	return nil
 }
 
 func initDevice() error {

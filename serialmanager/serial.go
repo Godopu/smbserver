@@ -3,8 +3,8 @@ package serialmanager
 import (
 	"context"
 	"errors"
-	"fmt"
 	"io/ioutil"
+	"log"
 	"path/filepath"
 	"strings"
 
@@ -26,23 +26,22 @@ func discoverDevice() (string, error) {
 	return "", errors.New("not found device")
 }
 
-func WatchNewDevice(ctx context.Context, ch_discover chan<- notify.EventInfo) error {
-	defer close(ch_discover)
-
+func WatchNewDevice(ctx context.Context) (string, error) {
+	log.Println("Watching device")
 	filter := make(chan notify.EventInfo, 1)
 	if err := notify.Watch("/dev", filter, notify.Create); err != nil {
-		return err
+		return "", err
 	}
 	defer notify.Stop(filter)
 
 	for {
 		select {
 		case <-ctx.Done():
-			return nil
+			return "", nil
 		case e := <-filter:
 			if strings.Contains(e.Path(), "/dev/ttyACM") {
-				fmt.Println(e.Path())
-				ch_discover <- e
+				return e.Path(), nil
+
 			}
 		}
 	}

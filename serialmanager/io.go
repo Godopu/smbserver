@@ -7,7 +7,7 @@ import (
 	"log"
 )
 
-func recv(port io.Reader, h func(e Event)) {
+func recv(port io.Reader, h func(e Event)) error {
 	reader := bufio.NewReader(port)
 
 	for {
@@ -15,11 +15,8 @@ func recv(port io.Reader, h func(e Event)) {
 		if err != nil {
 			if err == io.EOF {
 				log.Println("USB is disconnected")
-				if onDisconnected != nil {
-					onDisconnected(NewEvent(map[string]interface{}{"iface": iface}, "disconnected"))
-					panic(err)
-				}
-				return
+				
+				return err
 			}
 		}
 		recvObj := map[string]interface{}{}
@@ -31,4 +28,3 @@ func recv(port io.Reader, h func(e Event)) {
 		}
 	}
 }
-

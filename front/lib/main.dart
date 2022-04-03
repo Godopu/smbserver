@@ -59,6 +59,32 @@ class _MyHomePageState extends State<MyHomePage> {
     ctrl.loadData();
   }
 
+  void _restart() async {
+    var apiUrl = Uri.base.path[Uri.base.path.length - 1] == '/'
+        ? '${Uri.base.path}api/v1/restart'
+        : '${Uri.base.path}/api/v1/restart';
+
+    await http.post(
+      Uri.http(
+        serverAddr,
+        apiUrl,
+      ),
+    );
+  }
+
+  void _stop() async {
+    var apiUrl = Uri.base.path[Uri.base.path.length - 1] == '/'
+        ? '${Uri.base.path}api/v1/stop'
+        : '${Uri.base.path}/api/v1/stop';
+
+    await http.post(
+      Uri.http(
+        serverAddr,
+        apiUrl,
+      ),
+    );
+  }
+
   @override
   void dispose() {
     hText.dispose();
@@ -72,57 +98,105 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            const Text('Current Alarms', style: TextStyle(fontSize: 26)),
-            GetBuilder<MainController>(builder: (ctrl) {
-              return Text(ctrl.alarmList.value,
-                  style: const TextStyle(fontSize: 22));
-            }),
-            const Text('알람 추가', style: TextStyle(fontSize: 26)),
-            Row(
-              mainAxisSize: MainAxisSize.min,
+      body: Stack(
+        children: [
+          Center(
+            child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: 80,
-                  child: Center(
-                    child: TextField(
-                      inputFormatters: [LengthLimitingTextInputFormatter(2)],
-                      decoration:
-                          const InputDecoration(border: OutlineInputBorder()),
-                      textAlign: TextAlign.center,
-                      controller: hText,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                const Text('현재 설정된 알람', style: TextStyle(fontSize: 26)),
+                GetBuilder<MainController>(builder: (ctrl) {
+                  return Text(ctrl.alarmList.value,
+                      style: const TextStyle(fontSize: 22));
+                }),
+                const Text('알람 추가', style: TextStyle(fontSize: 26)),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: 80,
+                      child: Center(
+                        child: TextField(
+                          inputFormatters: [
+                            LengthLimitingTextInputFormatter(2)
+                          ],
+                          decoration: const InputDecoration(
+                              border: OutlineInputBorder()),
+                          textAlign: TextAlign.center,
+                          controller: hText,
+                          style: Theme.of(context).textTheme.headline4,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      ':',
                       style: Theme.of(context).textTheme.headline4,
                     ),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Text(
-                  ':',
-                  style: Theme.of(context).textTheme.headline4,
-                ),
-                const SizedBox(width: 10),
-                SizedBox(
-                  width: 80,
-                  child: Center(
-                    child: TextField(
-                      inputFormatters: [LengthLimitingTextInputFormatter(2)],
-                      decoration:
-                          const InputDecoration(border: OutlineInputBorder()),
-                      textAlign: TextAlign.center,
-                      controller: mText,
-                      style: Theme.of(context).textTheme.headline4,
+                    const SizedBox(width: 10),
+                    SizedBox(
+                      width: 80,
+                      child: Center(
+                        child: TextField(
+                          inputFormatters: [
+                            LengthLimitingTextInputFormatter(2)
+                          ],
+                          decoration: const InputDecoration(
+                              border: OutlineInputBorder()),
+                          textAlign: TextAlign.center,
+                          controller: mText,
+                          style: Theme.of(context).textTheme.headline4,
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ],
             ),
-          ],
-        ),
+          ),
+          Row(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: TextButton(
+                  onPressed: _stop,
+                  child: const Text(
+                    "종료",
+                    style: TextStyle(fontSize: 25, color: Colors.black),
+                  ),
+                  style: ButtonStyle(
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18.0),
+                        // side: BorderSide(color: Colors.red),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: TextButton(
+                  onPressed: _restart,
+                  child: const Text(
+                    "재시작",
+                    style: TextStyle(fontSize: 25, color: Colors.black),
+                  ),
+                  style: ButtonStyle(
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18.0),
+                        // side: BorderSide(color: Colors.red),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
       floatingActionButton: GetBuilder<MainController>(builder: (ctrl) {
         return FloatingActionButton(

@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"smbserver/config"
+	"smbserver/logger"
 	"smbserver/model"
 	"smbserver/router"
 	"smbserver/serialmanager"
@@ -10,7 +12,6 @@ import (
 )
 
 func watchConnectivity() {
-
 	enableInternet := true
 	if len(config.MyIP) == 0 {
 		enableInternet = false
@@ -44,6 +45,15 @@ func watchConnectivity() {
 }
 
 func main() {
+
+	logger.Start()
+
+	exitCh := make(chan interface{})
+	go func() {
+		time.Sleep(10 * time.Hour)
+		exitCh <- true
+	}()
+
 	model.Status["alarm"] = 0
 	model.Status["time"] = "00.00"
 	serialmanager.AddDiscoverHandleFunc(func(e serialmanager.Event) {
@@ -71,6 +81,9 @@ func main() {
 	// router.NewRouter().Run(config.Params["bind"].(string))
 
 	go watchConnectivity()
-	router.NewRouter().Run(config.Params["bind"].(string))
+	// time.Sleep(10 * time.Second)
+	go router.NewRouter().Run(config.Params["bind"].(string))
 
+	<-exitCh
+	os.Exit(logger.Stop())
 }

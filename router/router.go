@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"os/exec"
+	"smbserver/logger"
 	"smbserver/model"
 	"strings"
 	"time"
@@ -18,6 +21,8 @@ func NewRouter() *gin.Engine {
 	{
 		apiv1.POST("/alarm", PostAlarm)
 		apiv1.GET("/alarm", GetAlarm)
+		apiv1.POST("/restart", RestartApp)
+		apiv1.POST("/stop", StopSystem)
 	}
 	assetEngine := gin.New()
 	assetEngine.Static("/", "./web")
@@ -67,7 +72,7 @@ func PostAlarm(c *gin.Context) {
 	at := time.Date(n.Year(), n.Month(), n.Day(), h, m, 0, 0, n.Location())
 	fmt.Println(at)
 	if at.Sub(n).Seconds() <= 0 {
-		panic(errors.New("please enter the time after now on."))
+		panic(errors.New("please enter the time after now on"))
 	}
 
 	model.Alarm = append(model.Alarm, at)
@@ -83,4 +88,26 @@ func GetAlarm(c *gin.Context) {
 	}
 
 	c.String(http.StatusOK, builder.String())
+}
+
+func RestartApp(c *gin.Context) {
+	c.String(http.StatusOK, "system will restarted")
+
+	go func() {
+		time.Sleep(5 * time.Second)
+		os.Exit(logger.Stop())
+	}()
+
+}
+
+func StopSystem(c *gin.Context) {
+	c.String(http.StatusOK, "system will terminated")
+
+	go func() {
+		time.Sleep(5 * time.Second)
+		_, err := exec.Command("reboot").Output()
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}()
 }
