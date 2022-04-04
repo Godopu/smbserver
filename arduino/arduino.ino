@@ -61,16 +61,17 @@ void recvMsg()
 StaticJsonDocument<100> sendDoc;
 int preis = 0;
 int is = 0;
-int alarm = 0;
+int al = 0;
 
 char *ip = "0.0.0.0";
-char *t = "00.00";
+char *ti = "00.00";
 
 void setStatus()
 {
   if (preis != is)
   {
     lcd.clear();
+    preis = is;
   }
 
   if (is == 0)
@@ -81,10 +82,10 @@ void setStatus()
   else
   {
     printLCD(0, 0, ip);
-    printLCD(0, 1, t);
+    printLCD(0, 1, ti);
   }
 
-  if (alarm == 1)
+  if (al == 1)
   {
     tone(piezoPin, 391.9954, 2000);
   }
@@ -93,12 +94,12 @@ void sendStatus()
 {
   sendDoc["code"] = code;
   sendDoc["is"] = is;
-  sendDoc["alarm"] = alarm;
+  sendDoc["al"] = al;
   sendDoc["ip"] = ip;
-  sendDoc["t"] = t;
+  sendDoc["ti"] = ti;
 
   serializeJson(sendDoc, Serial);
-  Serial.println();
+  // Serial.println();
 }
 
 int timer = 0;
@@ -113,10 +114,10 @@ void loop()
     }
     else if (code == 200)
     {
-      alarm = recvDoc["alarm"];
+      al = recvDoc["al"];
       is = recvDoc["is"];
       ip = recvDoc["ip"];
-      t = recvDoc["t"];
+      ti = recvDoc["ti"];
     }
     sendStatus();
   }

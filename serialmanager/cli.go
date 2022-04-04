@@ -4,9 +4,10 @@ import (
 	"bufio"
 	"context"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io"
 	"log"
-	"os/exec"
 
 	"github.com/jacobsa/go-serial/serial"
 )
@@ -65,11 +66,15 @@ func Run() error {
 			discoverHandleFunc(NewEvent(map[string]interface{}{"iface": iface}, "discovered"))
 		}
 
+		fmt.Println("initDevice")
 		err = initDevice()
 		if err != nil {
-			panic(err)
+			log.Println(err)
+			port.Close()
+			continue
 		}
 
+		fmt.Println("recv")
 		err := recv(port, recvHandleFunc)
 		if err.Error() == "EOF" {
 			if onDisconnected != nil {
@@ -103,15 +108,19 @@ func initDevice() error {
 	}
 
 	reader := bufio.NewReader(port)
-	encoder := json.NewEncoder(port)
+	// encoder := json.NewEncoder(port)
 
 	sndMsg := map[string]interface{}{}
 	sndMsg["code"] = 100
 
 	for {
-		b, _, _ := reader.ReadLine()
+		b, _, err := reader.ReadLine()
+		if err != nil {
+			return err
+		}
 		rcvMsg := map[string]interface{}{}
-		err := json.Unmarshal(b, &rcvMsg)
+		err = json.Unmarshal(b, &rcvMsg)
+		fmt.Println(string(b))
 
 		if err != nil {
 			continue
@@ -124,13 +133,20 @@ func initDevice() error {
 			}
 			break
 		}
-		encoder.Encode(sndMsg)
+		err = Write(sndMsg)
+		if err != nil {
+			return err
+		}
+		// encoder.Encode(sndMsg)
 	}
 
 	return nil
 }
 
 func Write(obj interface{}) error {
+	if port != nil {
+		return errors.New("device is not connected")
+	}
 	enc := json.NewEncoder(port)
 	err := enc.Encode(obj)
 	if err != nil {
@@ -139,14 +155,14 @@ func Write(obj interface{}) error {
 	return nil
 }
 
-func changePermission(iface string) error {
-	log.Println("changing the mod of file")
+// func changePermission(iface string) error {
+// 	log.Println("changing the mod of file")
 
-	cmd := exec.Command("chmod", "a+rw", iface)
-	_, err := cmd.CombinedOutput()
-	if err != nil {
-		return err
-	}
+// 	cmd := exec.Command("chmod", "a+rw", iface)
+// 	_, err := cmd.CombinedOutput()
+// 	if err != nil {
+// 		return err
+// 	}
 
-	return nil
-}
+// 	return nil
+// }

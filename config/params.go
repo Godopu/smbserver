@@ -22,7 +22,7 @@ func init() {
 	}
 
 	p := properties.MustLoadFile("./config.properties", properties.UTF8)
-	Params["bind"] = p.GetString("bind", ":4000")
+	Params["bind"] = p.GetString("bind", ":9000")
 }
 
 func createInitFile() {
@@ -33,7 +33,7 @@ func createInitFile() {
 	defer f.Close()
 
 	p := properties.NewProperties()
-	p.SetValue("bind", ":4000")
+	p.SetValue("bind", ":9000")
 	p.Write(f, properties.UTF8)
 }
 

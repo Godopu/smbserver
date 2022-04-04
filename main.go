@@ -12,6 +12,7 @@ import (
 )
 
 func watchConnectivity() {
+
 	enableInternet := true
 	if len(config.MyIP) == 0 {
 		enableInternet = false
@@ -23,12 +24,11 @@ func watchConnectivity() {
 			if alarmTime.Sub(dt).Seconds() < 0 {
 				model.Status["alarm"] = 1
 				go func() {
-					time.Sleep(time.Second * 2)
+					time.Sleep(time.Second * 5)
 					model.Status["alarm"] = 0
 				}()
 				model.Alarm = append(model.Alarm[:i], model.Alarm[i+1:]...)
 			}
-
 		}
 		ip := config.GetIP()
 		if len(ip) == 0 && enableInternet {
@@ -66,11 +66,11 @@ func main() {
 			model.Status["time"] != e.Params()["t"] ||
 			model.Status["alarm"] != e.Params()["alarm"] {
 			var param = map[string]interface{}{
-				"code":  200,
-				"alarm": model.Status["alarm"],
-				"is":    model.Status["internetState"],
-				"t":     model.Status["time"],
-				"ip":    model.Status["ip"],
+				"code": 200,
+				"al":   model.Status["alarm"],
+				"is":   model.Status["internetState"],
+				"ti":   model.Status["time"],
+				"ip":   model.Status["ip"],
 			}
 			fmt.Println(param)
 			serialmanager.Write(param)
