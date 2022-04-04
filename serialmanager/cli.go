@@ -144,7 +144,7 @@ func initDevice() error {
 }
 
 func Write(obj interface{}) error {
-	if port != nil {
+	if port == nil {
 		return errors.New("device is not connected")
 	}
 	enc := json.NewEncoder(port)

@@ -99,7 +99,7 @@ void sendStatus()
   sendDoc["ti"] = ti;
 
   serializeJson(sendDoc, Serial);
-  // Serial.println();
+  Serial.println();
 }
 
 int timer = 0;
