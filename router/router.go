@@ -105,7 +105,7 @@ func StopSystem(c *gin.Context) {
 
 	go func() {
 		time.Sleep(5 * time.Second)
-		_, err := exec.Command("reboot").Output()
+		_, err := exec.Command("init", "0").Output()
 		if err != nil {
 			log.Fatalln(err)
 		}

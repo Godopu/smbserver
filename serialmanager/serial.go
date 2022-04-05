@@ -18,7 +18,7 @@ func discoverDevice() (string, error) {
 	}
 
 	for _, f := range fs {
-		if strings.Contains(f.Name(), "ttyACM") {
+		if strings.Contains(f.Name(), "ttyACM") || strings.Contains(f.Name(), "ttyUSB") {
 			return filepath.Join("/dev", f.Name()), nil
 		}
 	}
@@ -39,7 +39,7 @@ func WatchNewDevice(ctx context.Context) (string, error) {
 		case <-ctx.Done():
 			return "", nil
 		case e := <-filter:
-			if strings.Contains(e.Path(), "/dev/ttyACM") {
+			if strings.Contains(e.Path(), "/dev/ttyACM") || strings.Contains(e.Path(), "/dev/ttyUSB") {
 				return e.Path(), nil
 
 			}

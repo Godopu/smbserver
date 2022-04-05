@@ -1,6 +1,5 @@
 // Library Include
-#include <Servo.h>
-#include <DHT.h>
+// #include <DHT.h>
 // #include <Wire.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
@@ -54,7 +53,7 @@ void broadcastUUID()
 void recvMsg()
 {
   // memset(&recvDoc, 0x00, 0);
-  deserializeJson(recvDoc, Serial);
+  DeserializationError err = deserializeJson(recvDoc, Serial);
   code = recvDoc["code"];
 }
 

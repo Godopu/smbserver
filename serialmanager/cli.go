@@ -96,7 +96,7 @@ func initDevice() error {
 
 	options := serial.OpenOptions{
 		PortName:        iface,
-		BaudRate:        9600,
+		BaudRate:        57600,
 		DataBits:        8,
 		StopBits:        1,
 		MinimumReadSize: 16,
