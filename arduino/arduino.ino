@@ -15,6 +15,14 @@ StaticJsonDocument<200> INFO;
 StaticJsonDocument<200> recvDoc;
 int code = 0;
 
+StaticJsonDocument<100> sendDoc;
+int preis = 0;
+int is = 0;
+int al = 0;
+
+char *ip = "0.0.0.0";
+char *ti = "00.00";
+
 void printLCD(int col, int row, char *str)
 {
   for (int i = 0; i < strlen(str); i++)
@@ -38,7 +46,7 @@ void setup()
   // printLCD(0, 1, "Are You Ready? ");
 
   setStatus();
-  Serial.begin(9600); // Serial Monitor for Debug
+  Serial.begin(57600); // Serial Monitor for Debug
   while (!Serial)
     ;
   // Serial1.begin(9600); // Bluetooth Module
@@ -53,17 +61,9 @@ void broadcastUUID()
 void recvMsg()
 {
   // memset(&recvDoc, 0x00, 0);
-  DeserializationError err = deserializeJson(recvDoc, Serial);
+  deserializeJson(recvDoc, Serial);
   code = recvDoc["code"];
 }
-
-StaticJsonDocument<100> sendDoc;
-int preis = 0;
-int is = 0;
-int al = 0;
-
-char *ip = "0.0.0.0";
-char *ti = "00.00";
 
 void setStatus()
 {
@@ -110,6 +110,8 @@ void loop()
     if (code == 100)
     {
       broadcastUUID();
+      delay(1000);
+      return;
     }
     else if (code == 200)
     {

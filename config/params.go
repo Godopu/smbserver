@@ -45,7 +45,7 @@ func GetIP() string {
 	}
 
 	for _, i := range ifaces {
-		if strings.Index(i.Name, "en") == 0 || strings.Index(i.Name, "et") == 0 {
+		if strings.Index(i.Name, "en") == 0 || strings.Index(i.Name, "et") == 0 || strings.Index(i.Name, "usb") == 0 {
 			addrs, err := i.Addrs()
 			if err != nil {
 				panic(err)
